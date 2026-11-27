@@ -1,0 +1,48 @@
+name: ELS 일일 재평가
+
+on:
+  schedule:
+    - cron: "40 9 * * 1-5"      # 평일 18:40 KST (09:40 UTC). 한국거래소 휴장일은 코드에서 건너뜀
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: els-daily
+  cancel-in-progress: false
+
+jobs:
+  reval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: 테스트
+        run: python -m pytest -q tests/
+      - name: 재평가
+        id: run
+        env:
+          TZ: Asia/Seoul
+        run: |
+          set +e
+          python run_daily.py
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+      - name: 결과 커밋
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state/history.json docs
+          if git diff --cached --quiet; then echo "바뀐 것 없음(휴장일 등)"; exit 0; fi
+          git commit -m "재평가 $(TZ=Asia/Seoul date +%F)"
+          git push
+      - name: 실패 표시
+        if: steps.run.outputs.code != '0'
+        run: |
+          echo "run_daily.py 종료 코드 ${{ steps.run.outputs.code }} (2 = 입력 수집 실패)"
+          exit 1
