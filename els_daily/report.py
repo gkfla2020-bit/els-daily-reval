@@ -264,7 +264,7 @@ code{{background:var(--bg);padding:1px 5px;border-radius:4px}}
 <div class="book">{"".join(panes)}<div class="tabs">{"".join(tabs)}</div></div>
 <p class="small">실행 {html.escape(e['run_at'])} · {html.escape(e['where'])} · 소요 {e['seconds']}초 · 단위: 원금 100 기준. 숫자는 모두 실제 실행 결과이고, 가정은 '가정' 시트에 적었습니다. 투자 권유가 아닙니다.</p>
 
-<section><h2>어떻게 계산하나</h2><div class="card">
+<section><h2>계산 방법</h2><div class="card">
 <p><b>1. 입력</b> 한국거래소 지수 사이트에서 코스피200·VKOSPI 종가, 한국은행 ECOS에서 국고채 3년, Yahoo Finance에서 HSCEI 종가를 받고 출처와 받은 시각을 남깁니다.</p>
 <p><b>2. 재평가</b> 두 지수 상관 기하 브라운 운동 몬테카를로(경로 10,000개, 하루 1단계)로 상품마다 오늘 가치를 다시 매깁니다. 낙인은 매일 종가로 확인해 다음 날로 이어 붙입니다.</p>
 <p><b>3. 변동 분해</b> 어제 입력에서 시작해 기초자산 → 변동성 → 금리 → 시간 순서로 하나씩 오늘 값으로 바꿔 다시 평가합니다. 바꿀 때마다 생긴 차이가 그 입력의 효과입니다.</p>
